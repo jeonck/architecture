@@ -1,4 +1,4 @@
-baseURL = "https://architecture.metacog.co.kr/"
+baseURL = "https://architectures.metacog.co.kr/"
 locale = "en-us"
 title = "Architecture Field Notes"
 contentDir = "content"

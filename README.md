@@ -4,7 +4,7 @@ Practical architecture knowledge for DevOps engineers and developers — the
 decisions, trade-offs, and failure modes that only show up in production.
 The tacit, made explicit.
 
-**https://architecture.metacog.co.kr**
+**https://architectures.metacog.co.kr**
 
 ## What is here
 
