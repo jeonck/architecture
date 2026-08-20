@@ -1,0 +1,96 @@
+hero:
+  enable: true
+  weight: 10
+  template: hero
+
+  badge:
+    text: "Field notes, not textbook"
+    color: primary
+    pill: true
+    soft: true
+
+  title: "Architecture Field Notes"
+  subtitle: "Practical architecture knowledge for **DevOps engineers and developers** — the decisions, trade-offs, and failure modes that only show up in production. The tacit, made explicit."
+
+  ctaButton:
+    icon: rocket_launch
+    btnText: "Browse the Docs"
+    url: "/docs/"
+  cta2Button:
+    icon: hub
+    btnText: "View on GitHub"
+    url: "https://github.com/jeonck/architecture"
+
+  info: "40 pages. Every one names a default, the conditions that flip it, and what it costs."
+
+featureGrid:
+  enable: true
+  weight: 20
+  template: feature grid
+
+  title: "Eight areas where experience is expensive to acquire"
+  subtitle: "Each page answers the same question in a different context: what does an experienced engineer actually decide here, and what are they trading away?"
+
+  items:
+    - title: "Foundations"
+      icon: "foundation"
+      description: "Irreversible decisions, real constraints, coupling as currency, and why a boring baseline usually wins."
+      ctaLink:
+        text: browse
+        url: /docs/foundations/
+
+    - title: "System Design in Practice"
+      icon: "schema"
+      description: "Monolith first, boundaries that survive reorgs, sync vs async, contracts, and designing for the duplicate request."
+      ctaLink:
+        text: browse
+        url: /docs/system-design/
+
+    - title: "Data and State"
+      icon: "database"
+      description: "Datastore choice, zero-downtime migrations, the consistency model you actually need, caching, and when CDC pays."
+      ctaLink:
+        text: browse
+        url: /docs/data-and-state/
+
+    - title: "Delivery and CI/CD"
+      icon: "rocket_launch"
+      description: "Trunk-based development, pipelines ordered by feedback cost, progressive delivery, reproducible builds, and rollback."
+      ctaLink:
+        text: browse
+        url: /docs/delivery/
+
+    - title: "Platform and Infrastructure"
+      icon: "cloud"
+      description: "What Kubernetes charges, IaC that does not drift, config and secrets, tenancy models, and platform as a product."
+      ctaLink:
+        text: browse
+        url: /docs/platform/
+
+    - title: "Reliability and Operations"
+      icon: "monitor_heart"
+      description: "SLOs as a negotiating tool, observability worth paying for, backpressure, failure isolation, and useful postmortems."
+      ctaLink:
+        text: browse
+        url: /docs/reliability/
+
+    - title: "Security by Design"
+      icon: "shield"
+      description: "One-hour threat models, authorisation at the resource, secrets you can rotate, supply chain, and blast radius."
+      ctaLink:
+        text: browse
+        url: /docs/security/
+
+    - title: "Making Knowledge Explicit"
+      icon: "menu_book"
+      description: "ADRs people read, diagrams that age well, runbooks for 3am, design reviews, and team memory that outlives attrition."
+      ctaLink:
+        text: browse
+        url: /docs/knowledge/
+
+# The Lotus Docs theme ships its own data/landing.yaml; Hugo merges it with this
+# file, so theme-only blocks must be explicitly disabled here or they render.
+imageCompare:
+  enable: false
+  weight: 90
+  template: image compare
