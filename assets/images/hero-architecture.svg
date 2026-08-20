@@ -1,0 +1,86 @@
+<svg viewBox="0 0 560 400" width="560" height="400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="An abstract system architecture diagram: a client calling a gateway, which fans out to three services over a trust boundary, all backed by one datastore" style="max-width:100%;height:auto;display:block">
+  <defs>
+    <linearGradient id="afnCard" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#141d31"/>
+      <stop offset="100%" stop-color="#0b1020"/>
+    </linearGradient>
+    <linearGradient id="afnAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2f6fed"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="afnAccentSoft" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2f6fed" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.18"/>
+    </linearGradient>
+    <filter id="afnGlow" x="-40%" y="-80%" width="180%" height="260%">
+      <feGaussianBlur stdDeviation="7" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- card -->
+  <rect x="8" y="8" width="544" height="384" rx="16" fill="url(#afnCard)"/>
+  <rect x="8.5" y="8.5" width="543" height="383" rx="15.5" fill="none" stroke="#243252"/>
+
+  <!-- window chrome -->
+  <circle cx="38" cy="40" r="5" fill="#e06c62"/>
+  <circle cx="56" cy="40" r="5" fill="#d8a13c"/>
+  <circle cx="74" cy="40" r="5" fill="#4fae74"/>
+  <rect x="98" y="34" width="188" height="12" rx="6" fill="#1b2540"/>
+  <rect x="470" y="34" width="52" height="12" rx="6" fill="#16203a"/>
+  <line x1="8" y1="64" x2="552" y2="64" stroke="#1e2942"/>
+
+  <!-- client -->
+  <rect x="238" y="86" width="84" height="32" rx="9" fill="#172038" stroke="#2c3c60"/>
+  <rect x="252" y="98" width="56" height="8" rx="4" fill="#33456b"/>
+  <path d="M280 118 L280 146" stroke="#33456b" stroke-width="2"/>
+  <circle cx="280" cy="146" r="2.5" fill="#4a6091"/>
+
+  <!-- gateway (the decision point) -->
+  <g filter="url(#afnGlow)">
+    <rect x="196" y="146" width="168" height="38" rx="11" fill="url(#afnAccentSoft)" stroke="url(#afnAccent)" stroke-width="1.5"/>
+  </g>
+  <rect x="214" y="160" width="88" height="9" rx="4.5" fill="url(#afnAccent)"/>
+  <rect x="310" y="160" width="36" height="9" rx="4.5" fill="#2f6fed" opacity="0.45"/>
+
+  <!-- trust boundary -->
+  <line x1="44" y1="204" x2="516" y2="204" stroke="#2f6fed" stroke-opacity="0.42" stroke-width="1.5" stroke-dasharray="7 7"/>
+  <rect x="44" y="196" width="14" height="16" rx="4" fill="#0b1020" stroke="#2f6fed" stroke-opacity="0.5"/>
+  <path d="M51 200 v8 M47.5 204 h7" stroke="#2f6fed" stroke-opacity="0.75" stroke-width="1.4"/>
+
+  <!-- gateway -> services -->
+  <path d="M280 184 C280 202, 122 200, 122 222" fill="none" stroke="#33456b" stroke-width="2"/>
+  <path d="M280 184 L280 222" fill="none" stroke="#33456b" stroke-width="2"/>
+  <path d="M280 184 C280 202, 438 200, 438 222" fill="none" stroke="#33456b" stroke-width="2"/>
+
+  <!-- services -->
+  <g fill="#172038" stroke="#2c3c60">
+    <rect x="60" y="222" width="124" height="38" rx="9"/>
+    <rect x="218" y="222" width="124" height="38" rx="9"/>
+    <rect x="376" y="222" width="124" height="38" rx="9"/>
+  </g>
+  <g fill="#33456b">
+    <rect x="76" y="234" width="62" height="8" rx="4"/>
+    <rect x="234" y="234" width="76" height="8" rx="4"/>
+    <rect x="392" y="234" width="54" height="8" rx="4"/>
+  </g>
+  <g fill="#25334f">
+    <rect x="76" y="247" width="40" height="6" rx="3"/>
+    <rect x="234" y="247" width="30" height="6" rx="3"/>
+    <rect x="392" y="247" width="46" height="6" rx="3"/>
+  </g>
+
+  <!-- services -> datastore -->
+  <path d="M122 260 C122 288, 240 284, 244 300" fill="none" stroke="#2b3a5c" stroke-width="2"/>
+  <path d="M280 260 L280 298" fill="none" stroke="#2b3a5c" stroke-width="2"/>
+  <path d="M438 260 C438 288, 320 284, 316 300" fill="none" stroke="#2b3a5c" stroke-width="2"/>
+
+  <!-- datastore -->
+  <path d="M234 306 v30 a46 12 0 0 0 92 0 v-30" fill="#141e35" stroke="#2c3c60"/>
+  <ellipse cx="280" cy="306" rx="46" ry="12" fill="#1b2743" stroke="#33456b"/>
+  <rect x="258" y="322" width="44" height="7" rx="3.5" fill="#2a3654"/>
+
+  <!-- caption bars -->
+  <rect x="196" y="360" width="168" height="8" rx="4" fill="#1a2440"/>
+  <rect x="238" y="374" width="84" height="6" rx="3" fill="#16203a"/>
+</svg>

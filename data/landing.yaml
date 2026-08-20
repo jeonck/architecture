@@ -21,6 +21,11 @@ hero:
     btnText: "View on GitHub"
     url: "https://github.com/jeonck/architecture"
 
+  image:
+    path: "images"
+    filename: "hero-architecture.svg"
+    alt: "An abstract system architecture diagram: a client calling a gateway that fans out to three services across a trust boundary, all backed by one datastore"
+
   info: "40 pages. Every one names a default, the conditions that flip it, and what it costs."
 
 featureGrid:
