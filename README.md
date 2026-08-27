@@ -8,7 +8,7 @@ The tacit, made explicit.
 
 ## What is here
 
-40 pages across eight sections. Every page follows the same shape: the
+41 pages across nine sections. Every page follows the same shape: the
 situation, the default, when the default is wrong, and what it costs.
 
 | Section | Covers |
@@ -21,6 +21,7 @@ situation, the default, when the default is wrong, and what it costs.
 | Reliability and Operations | SLOs, observability, backpressure, failure isolation, incident response |
 | Security by Design | Threat modelling, identity and authorisation, secrets, supply chain, least privilege |
 | Making Knowledge Explicit | ADRs, diagrams, runbooks, design reviews, team memory |
+| Architecture Styles | Named styles read from real open-source systems — currently per-user instances behind capability gateways (Cloudflare OS) |
 
 ## Building locally
 

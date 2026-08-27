@@ -46,6 +46,7 @@ Skim the defaults. Read the costs.
 6. [Reliability and Operations](/docs/reliability/) — keeping it up, and knowing what "up" means.
 7. [Security by Design](/docs/security/) — the parts you cannot bolt on afterwards.
 8. [Making Knowledge Explicit](/docs/knowledge/) — ADRs, diagrams, runbooks, and team memory.
+9. [Architecture Styles](/docs/styles/) — named styles read from real open-source systems, and the trades they have already made for you.
 
 ## A warning
 
