@@ -42,6 +42,24 @@ Read that table as a readiness checklist before splitting, and as a diagnosis
 afterwards. Every unchecked row names a specific, recurring production
 symptom.
 
+The bill is not itemised so you can pick line items. It is itemised so you can
+see which one you skipped.
+
+```mermaid
+graph LR
+    A["Independent deploy"] --> X
+    B["Data ownership"] --> X
+    C["Contract testing"] --> X
+    D["Distributed tracing"] --> X
+    E["Named ownership"] --> X
+    F["Partial-failure handling"] --> X
+    G["Cheap new service"] --> X
+    H["Per-service SLO + on-call"] --> X
+    X{"Paid in full?"}
+    X -->|"every line item"| Y["Microservices<br/>teams deploy without each other"]
+    X -->|"one line item short"| Z["Distributed monolith<br/>every cost, none of the independence"]
+```
+
 ## The arithmetic nobody runs beforehand
 
 **Availability multiplies.** A request that synchronously touches six services
@@ -50,6 +68,17 @@ failure introduced by topology alone. The fix is not "make each service more
 reliable"; it is to stop making the chain synchronous. See
 [Synchronous vs Asynchronous
 Integration](/docs/system-design/sync-vs-async/).
+
+```mermaid
+graph LR
+    R["Request"] --> S1["A<br/>99.9%"]
+    S1 --> S2["B<br/>99.9%"]
+    S2 --> S3["C<br/>99.9%"]
+    S3 --> S4["D<br/>99.9%"]
+    S4 --> S5["E<br/>99.9%"]
+    S5 --> S6["F<br/>99.9%"]
+    S6 --> O["Served<br/>99.4% — about 4h/month"]
+```
 
 **Latency adds, and tails dominate.** Six hops at a 10ms median look fine and
 then a p99 of 200ms somewhere in the middle becomes your p50 under load,
