@@ -1,5 +1,5 @@
 ---
-weight: 9010
+weight: 9070
 title: "Per-User Instances Behind Capability Gateways"
 description: "Cloudflare OS gives every user a private, sandboxed copy of each app and routes all outside access through per-service brokers. What that style buys and what it costs."
 icon: "apps"
