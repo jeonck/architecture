@@ -19,6 +19,15 @@ managed containers scaled by the provider, state in managed services, glue made
 of queues and events. What you are buying is not "no operations" — it is a
 *different* operations surface, one that is mostly configuration.
 
+```mermaid
+graph TB
+    W["Four services still have<br/>to run somewhere"] --> Q{"Who owns the<br/>operations surface?"}
+    Q -->|"self-managed"| S["Patching, capacity planning,<br/>node pools, on-call for hosts"]
+    Q -->|"serverless"| M["IAM grants, execution limits,<br/>event wiring, cost per request"]
+    S --> N["Work you control"]
+    M --> P["Constraints you do not"]
+```
+
 ## What it genuinely buys
 
 - **No patching, no capacity planning, no node pool.** The largest recurring
@@ -48,6 +57,14 @@ opening a connection will exhaust a relational database that was sized for a
 handful of application servers. The answer is a connection proxy or an
 HTTP-based data API. This is the most common serverless production incident and
 it appears exactly when a launch goes well.
+
+```mermaid
+graph LR
+    T["Traffic spike"] --> F["Hundreds of concurrent<br/>function instances"]
+    F -->|"one connection each"| L{"Relational DB,<br/>sized for a few<br/>app servers"}
+    L -->|"connecting directly"| X["Limit exhausted —<br/>every request fails at once"]
+    L -->|"through a proxy or<br/>HTTP data API"| OK["Multiplexed onto<br/>a handful of connections"]
+```
 
 **IAM becomes the architecture.** Every interaction is a permission grant. Done
 well this is genuine least privilege — better than most VM estates ever
