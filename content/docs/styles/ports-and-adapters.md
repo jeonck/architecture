@@ -24,18 +24,10 @@ The domain sits in the middle and depends on nothing. It defines **ports** —
 interfaces expressed in its own vocabulary. **Adapters** on the outside
 implement or invoke them.
 
-```mermaid
-graph LR
-    HTTP[HTTP handler] -->|driving| P1(("Port:<br/>PlaceOrder"))
-    CLI[CLI] -->|driving| P1
-    Q[Queue consumer] -->|driving| P1
-    P1 --> D["Domain<br/>(no framework imports)"]
-    D --> P2(("Port:<br/>OrderRepository"))
-    D --> P3(("Port:<br/>PaymentGateway"))
-    P2 -->|driven| PG[(Postgres adapter)]
-    P2 -->|driven| MEM[In-memory adapter<br/>for tests]
-    P3 -->|driven| STRIPE[Stripe adapter]
-```
+<iframe src="/diagrams/ports-and-adapters.html" title="Ports and adapters: dependencies point inward"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/ports-and-adapters.html)
 
 Two kinds of port, and conflating them is the most common source of confusion:
 

@@ -37,18 +37,10 @@ In the repo's own terms: the backend is a **kernel**, per-service brokers are
 **drivers** (*Gatekeepers*), app instances are **processes** (*Gadgets*), and
 the code templates they start from are **executables** (*Blueprints*).
 
-```mermaid
-graph TB
-    U[User] --> K["Workspace<br/>(Durable Object · the kernel)"]
-    K --> G1["Gadget A<br/>Dynamic Worker facet<br/>globalOutbound: null"]
-    K --> G2["Gadget B<br/>Dynamic Worker facet<br/>globalOutbound: null"]
-    K --> AG["Agent<br/>writes + runs code"]
-    G1 -. explicit binding .-> GK1["Gatekeeper: GitHub"]
-    AG -. explicit binding .-> GK1
-    G2 -. explicit binding .-> GK2["Gatekeeper: Google"]
-    GK1 --> EXT1[(GitHub API)]
-    GK2 --> EXT2[(Google API)]
-```
+<iframe src="/diagrams/per-user-instances.html" title="Per-user instances behind capability gateways"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/per-user-instances.html)
 
 The dotted edges are the whole design. They do not exist until a human creates
 them, and nothing reaches the solid boxes on the right without one.

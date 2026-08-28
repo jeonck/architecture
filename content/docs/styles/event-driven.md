@@ -19,19 +19,10 @@ The event-driven style inverts that. Services publish **facts** about what
 happened; anyone who cares subscribes. Checkout no longer knows who is
 listening, and adding a consumer requires no change to the producer.
 
-```mermaid
-graph TB
-    subgraph "Published fact — checkout does not know who listens"
-    C2["Checkout"] -->|"OrderPlaced"| B[("Broker")]
-    B --> I2["Inventory"]
-    B --> L2["Loyalty"]
-    B --> N2["Notification"]
-    B -.-> X["the next consumer,<br/>added without touching checkout"]
-    end
-    subgraph "Call chain — one slow hop takes checkout down"
-    C1["Checkout"] --> I1["Inventory"] --> P1["Pricing"] --> L1["Loyalty"] --> N1["Notification"]
-    end
-```
+<iframe src="/diagrams/event-driven.html" title="Event-driven: the broker as the backbone"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/event-driven.html)
 
 Whether a *given* call should be async is [Synchronous vs Asynchronous
 Integration](/docs/system-design/sync-vs-async/). This page is about what

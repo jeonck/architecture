@@ -55,21 +55,10 @@ about checkout. Over a few years the `services/` folder becomes a drawer of
 1,200-line classes named after nouns, business logic migrates into controllers
 because that was closer, and some of it ends up in SQL because that was faster.
 
-```mermaid
-graph LR
-    subgraph "Package by layer — a feature is smeared"
-    C1[controllers/] --> S1[services/]
-    S1 --> R1[repositories/]
-    F1["feature: discounts"] -.-> C1
-    F1 -.-> S1
-    F1 -.-> R1
-    end
-    subgraph "Package by feature — layers live inside"
-    D["checkout/<br/>· handler<br/>· service<br/>· repository"]
-    B["billing/<br/>· handler<br/>· service<br/>· repository"]
-    D -->|public interface| B
-    end
-```
+<iframe src="/diagrams/layered.html" title="Layered: package by feature, layer inside it"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/layered.html)
 
 **Rule one: package by feature, layer inside it.** Layers describe dependency
 direction. They are a terrible top-level directory structure and an excellent

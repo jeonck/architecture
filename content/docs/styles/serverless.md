@@ -58,13 +58,10 @@ handful of application servers. The answer is a connection proxy or an
 HTTP-based data API. This is the most common serverless production incident and
 it appears exactly when a launch goes well.
 
-```mermaid
-graph LR
-    T["Traffic spike"] --> F["Hundreds of concurrent<br/>function instances"]
-    F -->|"one connection each"| L{"Relational DB,<br/>sized for a few<br/>app servers"}
-    L -->|"connecting directly"| X["Limit exhausted —<br/>every request fails at once"]
-    L -->|"through a proxy or<br/>HTTP data API"| OK["Multiplexed onto<br/>a handful of connections"]
-```
+<iframe src="/diagrams/serverless.html" title="Serverless: connections do not pool"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/serverless.html)
 
 **IAM becomes the architecture.** Every interaction is a permission grant. Done
 well this is genuine least privilege — better than most VM estates ever

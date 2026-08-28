@@ -69,16 +69,10 @@ reliable"; it is to stop making the chain synchronous. See
 [Synchronous vs Asynchronous
 Integration](/docs/system-design/sync-vs-async/).
 
-```mermaid
-graph LR
-    R["Request"] --> S1["A<br/>99.9%"]
-    S1 --> S2["B<br/>99.9%"]
-    S2 --> S3["C<br/>99.9%"]
-    S3 --> S4["D<br/>99.9%"]
-    S4 --> S5["E<br/>99.9%"]
-    S5 --> S6["F<br/>99.9%"]
-    S6 --> O["Served<br/>99.4% — about 4h/month"]
-```
+<iframe src="/diagrams/microservices.html" title="Availability multiplies along a synchronous chain"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/microservices.html)
 
 **Latency adds, and tails dominate.** Six hops at a 10ms median look fine and
 then a p99 of 200ms somewhere in the middle becomes your p50 under load,
