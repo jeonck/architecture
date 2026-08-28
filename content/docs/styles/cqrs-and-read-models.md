@@ -59,17 +59,10 @@ rung to cross deliberately rather than accidentally.
 That crossing looks like this — note that everything interesting, and every
 outage, lives on the dashed edges:
 
-```mermaid
-graph LR
-    CMD["Command"] --> WM["Write model<br/>upholds invariants"]
-    WM --> WS[("Write store<br/>the truth")]
-    WS -.->|"projection pipeline<br/>lag lives here"| R1[("Denormalised<br/>read tables")]
-    WS -.-> R2[("Search index")]
-    WS -.-> R3[("OLAP / reporting")]
-    QRY["Query"] --> R1
-    QRY --> R2
-    QRY --> R3
-```
+<iframe src="/diagrams/cqrs.html" title="CQRS at rung 4: asynchronous read models"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/cqrs.html)
 
 ## Read-your-own-writes, the problem you will actually hit
 
