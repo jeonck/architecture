@@ -56,12 +56,41 @@ shape. Forcing both through one model is the actual mistake.
 Rung 4 is where **eventual consistency enters the product**, and that is the
 rung to cross deliberately rather than accidentally.
 
+That crossing looks like this — note that everything interesting, and every
+outage, lives on the dashed edges:
+
+```mermaid
+graph LR
+    CMD["Command"] --> WM["Write model<br/>upholds invariants"]
+    WM --> WS[("Write store<br/>the truth")]
+    WS -.->|"projection pipeline<br/>lag lives here"| R1[("Denormalised<br/>read tables")]
+    WS -.-> R2[("Search index")]
+    WS -.-> R3[("OLAP / reporting")]
+    QRY["Query"] --> R1
+    QRY --> R2
+    QRY --> R3
+```
+
 ## Read-your-own-writes, the problem you will actually hit
 
 At rung 4 and above: the user edits a record, the UI redirects to the list, and
 the list is served by a projection that has not caught up. The item is missing
 or stale. This is not an edge case; it is the single most common CQRS bug
 report, and it is a design question, not a bug to be fixed later.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant W as Write model
+    participant P as Projection
+    participant R as Read store
+    U->>W: Save the edit
+    W-->>U: 200 OK, redirect to list
+    W->>P: change event
+    U->>R: GET the list
+    R-->>U: stale — the edit is not there
+    P->>R: apply the change (too late)
+```
 
 The workable answers, in order of preference:
 
