@@ -19,6 +19,20 @@ The event-driven style inverts that. Services publish **facts** about what
 happened; anyone who cares subscribes. Checkout no longer knows who is
 listening, and adding a consumer requires no change to the producer.
 
+```mermaid
+graph TB
+    subgraph "Published fact — checkout does not know who listens"
+    C2["Checkout"] -->|"OrderPlaced"| B[("Broker")]
+    B --> I2["Inventory"]
+    B --> L2["Loyalty"]
+    B --> N2["Notification"]
+    B -.-> X["the next consumer,<br/>added without touching checkout"]
+    end
+    subgraph "Call chain — one slow hop takes checkout down"
+    C1["Checkout"] --> I1["Inventory"] --> P1["Pricing"] --> L1["Loyalty"] --> N1["Notification"]
+    end
+```
+
 Whether a *given* call should be async is [Synchronous vs Asynchronous
 Integration](/docs/system-design/sync-vs-async/). This page is about what
 changes when the broker stops being an implementation detail and becomes the
@@ -93,6 +107,20 @@ One more, easy to miss: **publish facts, not commands dressed as facts.**
 `OrderPlaced` is a fact. `SendConfirmationEmail` on a topic is a command with
 extra latency, and it recreates the coupling you paid to remove — now with no
 error path back to the caller.
+
+The dead-letter bullet is a path rather than a checkbox, and it is the path
+nobody draws until the incident:
+
+```mermaid
+graph LR
+    T[("Topic")] --> C["Consumer"]
+    C -->|"handled"| OK["Offset committed"]
+    C -->|"transient error"| R["Retry with backoff"]
+    R --> C
+    R -->|"attempts exhausted"| D[("Dead-letter queue")]
+    D --> H["Someone decides:<br/>fix and replay, or accept the loss"]
+    H -.->|"rehydrate"| C
+```
 
 ## When the default is wrong
 
