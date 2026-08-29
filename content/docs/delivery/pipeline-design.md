@@ -115,6 +115,17 @@ engineer minutes by roughly two orders of magnitude. Ten engineers waiting five
 extra minutes per merge, several merges a day, is a meaningful fraction of a
 headcount per year.
 
+## A worked example: this site's own pipeline
+
+The stages above are the shape. Here is one real instance of it — the pipeline
+that publishes this site — documented end to end, including the two sharp edges
+that cost an afternoon each:
+
+<iframe src="/diagrams/delivery-pipeline-architecture.html" title="Architecture Field Notes delivery pipeline: sources, Hugo build, GitHub Actions, GitHub Pages"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/delivery-pipeline-architecture.html)
+
 ## See also
 
 - [Trunk-Based Development](../trunk-based-development/)

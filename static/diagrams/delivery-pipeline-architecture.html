@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture Field Notes — Delivery Pipeline Architecture</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1a202c;
+      --muted: #4a5568;
+      --line: #e2e8f0;
+      --panel: #f7fafc;
+      --data: #4299e1;
+      --proc: #ed8936;
+      --gate: #9f7aea;
+      --ok: #48bb78;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #12151c;
+        --fg: #e8eaed;
+        --muted: #a0aec0;
+        --line: #2d3340;
+        --panel: #1a1f28;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+    }
+    h1 {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      margin: 0 0 8px;
+      font-size: 1.7rem;
+    }
+    h1 small { display: block; font-weight: 400; font-size: .95rem; opacity: .9; margin-top: 6px; }
+    h2 {
+      font-size: 1.15rem;
+      margin: 40px 0 4px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--line);
+    }
+    h2 .num { color: var(--muted); font-weight: 400; margin-right: 8px; }
+    .lede { color: var(--muted); margin: 0 0 18px; font-size: .95rem; }
+    .section { margin: 30px 0; }
+    svg { max-width: 100%; height: auto; display: block; }
+    .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--data);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .card.proc { border-left-color: var(--proc); }
+    .card.gate { border-left-color: var(--gate); }
+    .card.ok { border-left-color: var(--ok); }
+    .card h3 { margin: 0 0 8px; font-size: .95rem; }
+    .card ul { margin: 0; padding-left: 18px; font-size: .87rem; color: var(--muted); }
+    .card li { margin-bottom: 4px; }
+    table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+    th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; background: var(--panel); padding: 1px 5px; border-radius: 4px; }
+    .layer {
+      display: flex; align-items: stretch; gap: 0;
+      border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-bottom: 10px;
+    }
+    .layer .tag {
+      flex: 0 0 150px; padding: 14px 16px; color: #fff; font-weight: 600; font-size: .88rem;
+      display: flex; align-items: center;
+    }
+    .layer .body { flex: 1; padding: 14px 16px; background: var(--panel); font-size: .88rem; color: var(--muted); }
+    .layer .body strong { color: var(--fg); font-weight: 600; }
+    .note { font-size: .85rem; color: var(--muted); border-left: 3px solid var(--gate); padding: 6px 0 6px 14px; margin: 16px 0; }
+    .svgtext { font-family: system-ui, sans-serif; }
+  </style>
+</head>
+<body>
+
+<h1>Architecture Field Notes — Delivery Pipeline
+  <small>Hugo static site → GitHub Actions → GitHub Pages · architectures.metacog.co.kr</small>
+</h1>
+
+<div class="section">
+  <h2><span class="num">01</span>Business context</h2>
+  <p class="lede">What the pipeline exists to do, and how you would know it is working.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>Objective</h3>
+      <ul>
+        <li>Publish practical architecture knowledge — the tacit, made explicit</li>
+        <li>Nine sections, every page the same shape: the situation, the default, when it is wrong, what it costs</li>
+        <li>A prose edit reaches readers without a human touching a server</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Users</h3>
+      <ul>
+        <li>DevOps engineers and developers reading the published site</li>
+        <li>One author committing Markdown and diagram artifacts to <code>main</code></li>
+      </ul>
+    </div>
+    <div class="card ok">
+      <h3>Value</h3>
+      <ul>
+        <li>No build step to run locally before publishing, and no deploy credentials on a laptop</li>
+        <li>The published site is a pure function of the commit — reproducible from the repository alone</li>
+      </ul>
+    </div>
+    <div class="card gate">
+      <h3>Metrics that matter</h3>
+      <ul>
+        <li>Push to live: one workflow run, no manual gate</li>
+        <li>Determinism: Hugo version pinned to <code>0.161.1</code>, Go to <code>1.22</code></li>
+        <li>Concurrency group <code>pages</code> with <code>cancel-in-progress: false</code> — deploys never interleave</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2><span class="num">02</span>Data flow</h2>
+  <p class="lede">Sources on the left, the build in the middle, the published artifact on the right.</p>
+  <svg viewBox="0 0 900 380" role="img" aria-label="Data flow from repository sources through the Hugo build to GitHub Pages">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#718096"/>
+      </marker>
+    </defs>
+
+    <text x="115" y="34" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#4299e1">SOURCES</text>
+    <text x="450" y="34" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#ed8936">BUILD</text>
+    <text x="785" y="34" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#48bb78">PUBLISHED</text>
+
+    <rect x="30" y="60" width="170" height="66" rx="7" fill="#4299e1"/>
+    <text x="115" y="88" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#fff">Markdown content</text>
+    <text x="115" y="107" text-anchor="middle" class="svgtext" font-size="11" fill="#e6f0fa">content/docs/ · 9 sections</text>
+
+    <rect x="30" y="152" width="170" height="66" rx="7" fill="#4299e1"/>
+    <text x="115" y="180" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#fff">Diagram artifacts</text>
+    <text x="115" y="199" text-anchor="middle" class="svgtext" font-size="11" fill="#e6f0fa">static/diagrams · assets/</text>
+
+    <rect x="30" y="244" width="170" height="66" rx="7" fill="#4299e1"/>
+    <text x="115" y="272" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#fff">Config + theme</text>
+    <text x="115" y="291" text-anchor="middle" class="svgtext" font-size="11" fill="#e6f0fa">hugo.toml · Lotus Docs module</text>
+
+    <rect x="365" y="112" width="170" height="66" rx="7" fill="#ed8936"/>
+    <text x="450" y="140" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#fff">Hugo extended</text>
+    <text x="450" y="159" text-anchor="middle" class="svgtext" font-size="11" fill="#fdf0e4">hugo --gc --minify</text>
+
+    <rect x="365" y="204" width="170" height="66" rx="7" fill="#ed8936"/>
+    <text x="450" y="232" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#fff">Go module fetch</text>
+    <text x="450" y="251" text-anchor="middle" class="svgtext" font-size="11" fill="#fdf0e4">resolves the theme</text>
+
+    <rect x="700" y="112" width="170" height="66" rx="7" fill="#48bb78"/>
+    <text x="785" y="140" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#fff">Pages artifact</text>
+    <text x="785" y="159" text-anchor="middle" class="svgtext" font-size="11" fill="#e6f7ec">./public</text>
+
+    <rect x="700" y="204" width="170" height="66" rx="7" fill="#48bb78"/>
+    <text x="785" y="232" text-anchor="middle" class="svgtext" font-size="13" font-weight="600" fill="#fff">Custom domain</text>
+    <text x="785" y="251" text-anchor="middle" class="svgtext" font-size="11" fill="#e6f7ec">architectures.metacog.co.kr</text>
+
+    <path d="M200,93 L300,93 L300,145 L363,145" stroke="#718096" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <path d="M200,185 L300,185 L300,145 L363,145" stroke="#718096" stroke-width="2" fill="none"/>
+    <path d="M200,277 L300,277 L300,237 L363,237" stroke="#718096" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <path d="M535,145 L698,145" stroke="#718096" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <path d="M450,204 L450,182" stroke="#718096" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+    <path d="M785,178 L785,202" stroke="#718096" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+    <text x="617" y="137" text-anchor="middle" class="svgtext" font-size="11" fill="#718096">upload-pages-artifact</text>
+    <text x="843" y="194" text-anchor="middle" class="svgtext" font-size="11" fill="#718096">deploy-pages</text>
+
+    <text x="30" y="345" class="svgtext" font-size="11" fill="#718096">Trigger: push to main, or workflow_dispatch — no scheduled build, no manual approval gate</text>
+  </svg>
+</div>
+
+<div class="section">
+  <h2><span class="num">03</span>Processing pipeline</h2>
+  <p class="lede">Stages ordered by probability of catching a failure divided by time to run. Everything left of the gate blocks; everything right of it deploys.</p>
+  <svg viewBox="0 0 900 250" role="img" aria-label="Pipeline stages from fast checks through the merge gate to progressive deploy and verification">
+    <defs>
+      <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#718096"/>
+      </marker>
+    </defs>
+
+    <text x="30" y="30" class="svgtext" font-size="12" font-weight="600" fill="#48bb78">FAST — blocks the merge</text>
+    <text x="620" y="30" class="svgtext" font-size="12" font-weight="600" fill="#ed8936">SLOW — after the gate</text>
+
+    <rect x="30" y="48" width="120" height="58" rx="7" fill="#48bb78"/>
+    <text x="90" y="72" text-anchor="middle" class="svgtext" font-size="12" font-weight="600" fill="#fff">Lint + types</text>
+    <text x="90" y="90" text-anchor="middle" class="svgtext" font-size="11" fill="#e6f7ec">~30s</text>
+
+    <rect x="175" y="48" width="120" height="58" rx="7" fill="#48bb78"/>
+    <text x="235" y="72" text-anchor="middle" class="svgtext" font-size="12" font-weight="600" fill="#fff">Unit tests</text>
+    <text x="235" y="90" text-anchor="middle" class="svgtext" font-size="11" fill="#e6f7ec">~2 min</text>
+
+    <rect x="320" y="48" width="120" height="58" rx="7" fill="#ed8936"/>
+    <text x="380" y="72" text-anchor="middle" class="svgtext" font-size="12" font-weight="600" fill="#fff">Build once</text>
+    <text x="380" y="90" text-anchor="middle" class="svgtext" font-size="11" fill="#fdf0e4">~3 min</text>
+
+    <rect x="465" y="48" width="120" height="58" rx="7" fill="#ed8936"/>
+    <text x="525" y="72" text-anchor="middle" class="svgtext" font-size="12" font-weight="600" fill="#fff">Integration</text>
+    <text x="525" y="90" text-anchor="middle" class="svgtext" font-size="11" fill="#fdf0e4">~5 min</text>
+
+    <polygon points="670,48 730,77 670,106 610,77" fill="#9f7aea"/>
+    <text x="670" y="74" text-anchor="middle" class="svgtext" font-size="11" font-weight="600" fill="#fff">merge</text>
+    <text x="670" y="89" text-anchor="middle" class="svgtext" font-size="11" font-weight="600" fill="#fff">gate</text>
+
+    <rect x="760" y="48" width="130" height="58" rx="7" fill="#9f7aea"/>
+    <text x="825" y="72" text-anchor="middle" class="svgtext" font-size="12" font-weight="600" fill="#fff">Promote artifact</text>
+    <text x="825" y="90" text-anchor="middle" class="svgtext" font-size="11" fill="#efe6fb">same bytes</text>
+
+    <rect x="465" y="152" width="140" height="58" rx="7" fill="#4299e1"/>
+    <text x="535" y="176" text-anchor="middle" class="svgtext" font-size="12" font-weight="600" fill="#fff">Progressive deploy</text>
+    <text x="535" y="194" text-anchor="middle" class="svgtext" font-size="11" fill="#e6f0fa">deploy ≠ release</text>
+
+    <rect x="660" y="152" width="140" height="58" rx="7" fill="#4299e1"/>
+    <text x="730" y="176" text-anchor="middle" class="svgtext" font-size="12" font-weight="600" fill="#fff">Post-deploy verify</text>
+    <text x="730" y="194" text-anchor="middle" class="svgtext" font-size="11" fill="#e6f0fa">then rollback path</text>
+
+    <rect x="240" y="152" width="180" height="58" rx="7" fill="none" stroke="#718096" stroke-width="1.5" stroke-dasharray="6 5"/>
+    <text x="330" y="176" text-anchor="middle" class="svgtext" font-size="12" font-weight="600" fill="#718096">Nightly / scheduled</text>
+    <text x="330" y="194" text-anchor="middle" class="svgtext" font-size="11" fill="#718096">e2e · load · scans</text>
+
+    <path d="M150,77 L173,77" stroke="#718096" stroke-width="2" marker-end="url(#arrow2)"/>
+    <path d="M295,77 L318,77" stroke="#718096" stroke-width="2" marker-end="url(#arrow2)"/>
+    <path d="M440,77 L463,77" stroke="#718096" stroke-width="2" marker-end="url(#arrow2)"/>
+    <path d="M585,77 L608,77" stroke="#718096" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+    <path d="M730,77 L758,77" stroke="#718096" stroke-width="2" marker-end="url(#arrow2)"/>
+    <path d="M825,106 L825,130 L535,130 L535,150" stroke="#718096" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+    <path d="M605,181 L658,181" stroke="#718096" stroke-width="2" marker-end="url(#arrow2)"/>
+    <path d="M380,106 L380,130 L330,130 L330,150" stroke="#718096" stroke-width="2" fill="none" stroke-dasharray="6 5" marker-end="url(#arrow2)"/>
+
+    <text x="30" y="238" class="svgtext" font-size="11" fill="#718096">Target: under 10 minutes to a merge decision, under 5 for the pre-merge portion. Beyond that the feedback loop is broken.</text>
+  </svg>
+  <div class="note">
+    On this site the pipeline is short: there is nothing to unit test, so the fast lane is
+    <code>hugo --gc --minify</code> succeeding, and the gate is a push to <code>main</code>.
+    The stage ordering above is the shape the same repository would take once it had tests to run.
+  </div>
+</div>
+
+<div class="section">
+  <h2><span class="num">04</span>System architecture</h2>
+  <p class="lede">Four layers. Everything below the publish layer runs on GitHub-hosted infrastructure; nothing runs on a machine anybody owns.</p>
+
+  <div class="layer">
+    <div class="tag" style="background:#4299e1">Source</div>
+    <div class="body">
+      <strong>content/docs/</strong> — Markdown pages across nine sections ·
+      <strong>static/diagrams/</strong> — self-contained interactive HTML diagrams served as-is ·
+      <strong>assets/diagrams/</strong> — images that pass through the theme's render hook ·
+      <strong>hugo.toml</strong> — <code>baseURL</code>, goldmark with <code>unsafe = true</code>, module import
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="tag" style="background:#ed8936">Build</div>
+    <div class="body">
+      <strong>Hugo extended 0.161.1</strong> installed from the release <code>.deb</code>, pinned by <code>HUGO_VERSION</code> ·
+      <strong>Go 1.22</strong> present only so Hugo Modules can resolve the theme ·
+      <strong>Lotus Docs</strong> fetched as a Hugo Module, not vendored as a submodule ·
+      output written to <code>./public</code>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="tag" style="background:#9f7aea">Delivery</div>
+    <div class="body">
+      <strong>.github/workflows/hugo.yml</strong> — two jobs, <code>build</code> then <code>deploy</code> ·
+      permissions scoped to <code>contents: read</code>, <code>pages: write</code>, <code>id-token: write</code> ·
+      concurrency group <code>pages</code> serialises deploys ·
+      <code>upload-pages-artifact@v3</code> hands <code>./public</code> to <code>deploy-pages@v4</code>
+    </div>
+  </div>
+
+  <div class="layer">
+    <div class="tag" style="background:#48bb78">Publish</div>
+    <div class="body">
+      <strong>GitHub Pages</strong> with source set to GitHub Actions ·
+      <strong>static/CNAME</strong> carries the custom domain into the artifact ·
+      DNS delegated to the registrar's nameservers, subdomain <code>CNAME</code> to the Pages host
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2><span class="num">05</span>Features</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Functional</h3>
+      <ul>
+        <li>Push to <code>main</code> publishes; no other trigger is required</li>
+        <li><code>workflow_dispatch</code> for a manual rebuild without a content change</li>
+        <li>Mermaid diagrams rendered by the theme; richer diagrams embedded as standalone HTML</li>
+        <li>Raw HTML permitted in Markdown, so a diagram can be an <code>&lt;iframe&gt;</code> with no shortcode</li>
+      </ul>
+    </div>
+    <div class="card proc">
+      <h3>Non-functional</h3>
+      <ul>
+        <li><strong>Reproducible</strong> — every tool version pinned in the workflow, not floating</li>
+        <li><strong>Serialised</strong> — one deploy at a time, and a running deploy is never cancelled</li>
+        <li><strong>Least privilege</strong> — the token can read the repo and write Pages, nothing else</li>
+        <li><strong>No credentials locally</strong> — publishing authority lives in the workflow's OIDC token</li>
+      </ul>
+    </div>
+    <div class="card gate">
+      <h3>Known sharp edges</h3>
+      <ul>
+        <li>Omitting the Go step fails the build with <code>go.mod file not found</code> — the theme is a module</li>
+        <li><code>resources.Get</code> in the theme's image hook reads <code>assets/</code>, never <code>static/</code>; an image in the wrong directory renders as nothing at all</li>
+        <li><code>fetch-depth: 0</code> is required for <code>.GitInfo</code>-derived dates</li>
+      </ul>
+    </div>
+    <div class="card ok">
+      <h3>Deliberately absent</h3>
+      <ul>
+        <li>No staging environment — the artifact is static and the rollback is a revert</li>
+        <li>No link checker or HTML validation gate yet; it would belong post-merge, not blocking</li>
+        <li>No preview deployments per pull request</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2><span class="num">06</span>Deployment</h2>
+  <table>
+    <thead>
+      <tr><th>Aspect</th><th>Detail</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Model</td><td>Continuous deployment. Every commit on <code>main</code> that builds is published; there is no release branch and no approval step.</td></tr>
+      <tr><td>Runner</td><td><code>ubuntu-latest</code>, GitHub-hosted. Two jobs: <code>build</code> produces the artifact, <code>deploy</code> consumes it via <code>needs: build</code>.</td></tr>
+      <tr><td>Prerequisites</td><td>Pages source set to <em>GitHub Actions</em> in repository settings; a Go toolchain in the runner for module resolution; DNS <code>CNAME</code> for the custom domain.</td></tr>
+      <tr><td>Rollback</td><td><code>git revert</code> and push. Recovery time is one pipeline run, which is the argument for keeping the pipeline short.</td></tr>
+      <tr><td>Failure mode</td><td>A failed build leaves the previously deployed site untouched — Pages only swaps once <code>deploy-pages</code> succeeds.</td></tr>
+      <tr><td>Blast radius</td><td>The whole site, since it is one artifact. Acceptable because the content is static and the undo path is a commit.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>
