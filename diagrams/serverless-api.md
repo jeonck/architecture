@@ -49,14 +49,15 @@ Companion guide to `serverless-api.drawio`. Technical audience.
 ## Rendering
 
 - Source: `serverless-api.drawio` — open in draw.io desktop or app.diagrams.net
-- Export: `serverless-api.drawio.png` — the double extension means the diagram
+- Export: `../assets/diagrams/serverless-api.drawio.png` — published at
+  the page bundle; the double extension means the diagram
   XML is embedded, so the PNG itself reopens in draw.io and stays editable
 
 Re-export after editing the source:
 
 ```bash
 /Applications/draw.io.app/Contents/MacOS/draw.io -x -f png -e -b 10 \
-  -o serverless-api.drawio.png serverless-api.drawio
+  -o ../assets/diagrams/serverless-api.drawio.png serverless-api.drawio
 ```
 
 ## Layout notes

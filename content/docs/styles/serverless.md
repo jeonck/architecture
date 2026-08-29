@@ -28,6 +28,12 @@ graph TB
     M --> P["Constraints you do not"]
 ```
 
+Concretely, on one provider, the smallest honest version of the style is this
+— note that Cognito, CloudWatch and the dead-letter queue are not extras, they
+are the configuration surface you just took ownership of:
+
+![Serverless API on AWS: client through API Gateway to Lambda and DynamoDB, with a Cognito authorizer, CloudWatch and a Lambda dead-letter queue](diagrams/serverless-api.drawio.png)
+
 ## What it genuinely buys
 
 - **No patching, no capacity planning, no node pool.** The largest recurring
