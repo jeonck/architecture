@@ -8,7 +8,7 @@ The tacit, made explicit.
 
 ## What is here
 
-47 pages across nine sections. Every page follows the same shape: the
+48 pages across nine sections. Every page follows the same shape: the
 situation, the default, when the default is wrong, and what it costs.
 
 | Section | Covers |
