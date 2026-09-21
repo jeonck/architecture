@@ -30,24 +30,25 @@ usually go wrong:
 
 - It rejected site builders (Wix, GoDaddy) because member boards and
   job listings are weak there, and rejected custom development because
-  of cost and developer dependency. WordPress plus plugins, with a
-  three-stage roadmap ending in "custom-build only the core features."
+  of cost and developer dependency. WordPress on Cloudways, plus
+  plugins, with a three-stage roadmap ending in "custom-build only the
+  core features."
 - It noticed that five of the six menus are the same thing: a post with
   a category, some structured fields, an expiry, and a paid top slot.
-  One directory plugin, five directory types.
+  One directory plugin (Directorist), five directory types.
 
 What it also had:
 
-- Around fifteen plugins on day one, including a forum, a payments
-  extension, an ownership-claim extension, a media offload to object
-  storage, two overlapping spam tools, and a security plugin that
-  duplicated the CDN's firewall.
+- Around fifteen plugins on day one, including a forum (wpForo),
+  Directorist's paid Pricing Plans and Claim extensions, a media offload
+  to Cloudflare R2, Akismet and reCAPTCHA doing the same job, and
+  Wordfence duplicating the Cloudflare WAF already in front of the site.
 - Region and trade defined per menu, as fields inside each directory
   type.
-- Newsletter preferences stored only in the email provider. Six interest
-  checkboxes mapped to six mailing groups. The third roadmap stage
-  promised "instant alerts matched on region and trade," which that
-  provider's RSS campaigns cannot do.
+- Newsletter preferences stored only in MailerLite. Six interest
+  checkboxes mapped to six MailerLite groups. The third roadmap stage
+  promised "instant alerts matched on region and trade," which
+  MailerLite's RSS campaigns cannot do.
 - Company profiles (materials vendors, equipment rental firms) placed
   inside the transactional listing types, so they would expire every
   sixty days like a for-sale post.
@@ -81,11 +82,11 @@ every listing type and by the alert system. The first draft of the
 rewrite got this right for four types and then gave the contractor type
 its own `service_area` field. Caught on the second pass.
 
-**Subscription preferences moved into the site's own user records.** The
-email provider receives a one-way sync and sends. Unsubscribes come back
-by webhook. The signup form is the site's registration form, not the
-provider's embed, because whichever form runs first owns the data. The
-rewritten plan said the right thing on one page and named the provider's
+**Subscription preferences moved into WordPress user records.**
+MailerLite receives a one-way sync and sends. Unsubscribes come back by
+webhook. The signup form is the WordPress registration form, not the
+MailerLite embed, because whichever form runs first owns the data. The
+rewritten plan said the right thing on one page and named the MailerLite
 embed form on another. Caught on the second pass.
 
 **Company profiles became their own listing type** with a one-year
@@ -98,9 +99,9 @@ category, same as a general contractor.
 **URLs got a permanent shape** before anything was built:
 `/{segment}/{public-id}/` with an optional slug suffix that routing
 ignores. Korean titles do not produce English slugs, so the short public
-ID carries the identity. The directory plugin's default `/directory/`
-paths are never exposed, which means a rewrite rule that someone has to
-write and test.
+ID carries the identity. Directorist's default `/directory/` paths are
+never exposed, and since Directorist uses a single post type for every
+directory, that means a rewrite rule that someone has to write and test.
 
 **Every piece of custom code goes in one site plugin.** Not the theme,
 not a snippets plugin. The completion criteria for phase one include
@@ -109,22 +110,25 @@ replaces WordPress, that plugin's function list is the specification of
 what the business rules were.
 
 **Phase one shrank.** Multi-user organisations, the forum, payments,
-ownership claims, reviews, the resume upload, and object storage all
+ownership claims, reviews, the resume upload, and Cloudflare R2 all
 moved to "when there is evidence of demand." The plugin count went from
-roughly fifteen to seven external plus the one site plugin plus the two
-the host installs anyway.
+roughly fifteen to seven external (Directorist, MailerLite, EWWW,
+UpdraftPlus, Rank Math, Turnstile, WP Mail SMTP) plus the one site
+plugin plus the two Cloudways installs anyway (Breeze and Redis Object
+Cache).
 
 ## What the review left alone
 
-The choice of WordPress, the managed host, the directory plugin, and the
-email provider all stayed. The review's job was not to replace the
-stack with a better one. It was to make the stack replaceable.
+WordPress, Cloudways, Directorist, and MailerLite all stayed. The
+review's job was not to replace the stack with a better one. It was to
+make the stack replaceable.
 
-Object storage for photos was deferred rather than removed. The host's
-plan includes 50 GB of disk; at five compressed photos per post that is
-tens of thousands of posts, and posts expire. Moving media to a bucket
-later is a standard migration. Moving it on day one meant a plugin with
-weak support for that bucket type and a public URL for every resume.
+Cloudflare R2 for photos was deferred rather than removed. The
+Cloudways 2 GB plan on DigitalOcean includes 50 GB of disk; at five
+compressed photos per post that is tens of thousands of posts, and posts
+expire. Moving media to R2 later is a standard migration. Moving it on
+day one meant an offload plugin with weak R2 support and a public URL
+for every resume.
 
 The cost table was not touched. The monthly numbers were plausible and
 the review had nothing better.
@@ -160,17 +164,17 @@ lives, what the monthly export must contain, and the rule that renewing
 a post does not bump it to the top.
 
 What is deliberately still cheap and will probably be thrown away: the
-theme, the directory plugin's screens, the weekly digest built from an
+theme, Directorist's screens, the weekly digest built from an
 RSS feed, the manual ownership-verification process, and the manual
 "premium placement" that an administrator sets by hand until someone
 proves people will pay for it.
 
 Three questions remain open and are listed in the plan as things the
 implementer must answer on a staging site before build: whether the
-directory plugin can gate a contact field behind login without custom
-code, whether per-type URL prefixes survive its list and filter pages,
-and whether one directory type can require different fields per
-category. Each has a fallback in the site plugin. None is a reason to
+free tier of Directorist can gate a contact field behind login without
+custom code, whether per-type URL prefixes survive its list and filter
+pages, and whether one Directorist directory type can require different
+fields per category. Each has a fallback in the site plugin. None is a reason to
 change the stack.
 
 That is the level. Not "optimised." Bounded. Every part is either
