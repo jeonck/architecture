@@ -1,10 +1,10 @@
 ---
 weight: 90
 title: "Architecture Styles"
-description: "The named styles you will actually meet — layered, hexagonal, microservices, event-driven, CQRS, serverless, per-user instances, and the data platform — and the bill each one hands you."
+description: "The named styles you will actually meet — layered, hexagonal, microservices, event-driven, CQRS, serverless, three-tier on AWS, per-user instances, and the data platform — and the bill each one hands you."
 icon: "category"
 date: "2026-08-27"
-lastmod: "2026-08-28"
+lastmod: "2026-10-18"
 draft: false
 ---
 
