@@ -40,18 +40,10 @@ is the index**. A query constrained on partition columns reads a few objects; th
 same query without them reads the bucket. Cost and latency here are a function
 of your prefix scheme, not of how much data you have.
 
-```mermaid
-graph LR
-    A["App / service logs"] --> CWL[CloudWatch Logs]
-    CWL -->|subscription filter<br/>gzip + base64| FH
-    B["Agents, SDKs,<br/>Direct PUT"] --> FH
-    FH["Amazon Data Firehose<br/>decompress → extract →<br/>buffer 60–900s → Parquet"]
-    GLUE[("AWS Glue<br/>Data Catalog")] -.->|schema, required| FH
-    FH --> S3[("S3 data lake<br/>dt=…/hour=…/service=…")]
-    GLUE -.->|table + projection| ATH
-    S3 --> ATH[Athena · SQL]
-    CWL -->|metric filters| ALARM["Alarms, Live Tail<br/>(stays here)"]
-```
+<iframe src="/diagrams/log-lake.html" title="Query-in-place logs: the partition layout is the index"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/log-lake.html)
 
 Note what the diagram says about CloudWatch Logs: it does not go away. Alarms
 and live tail need seconds-fresh data and stay where they are. The lake is the

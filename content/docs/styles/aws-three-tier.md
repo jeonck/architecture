@@ -33,30 +33,10 @@ believing its network diagram says something about its code.
 
 ## The reference topology
 
-```mermaid
-graph TB
-    U[Users] --> R53[Route 53]
-    R53 --> CF[CloudFront]
-    CF -->|static| S3F[(S3: frontend assets<br/>private, via OAC)]
-    CF -->|/api| WAF[AWS WAF]
-    WAF --> ALB["ALB<br/>public subnets, 2+ AZs"]
-    subgraph "Private subnet AZ-A"
-    E1[EC2 / app]
-    end
-    subgraph "Private subnet AZ-B"
-    E2[EC2 / app]
-    end
-    ALB --> E1
-    ALB --> E2
-    E1 --> DB[("Aurora / RDS<br/>Multi-AZ, private")]
-    E2 --> DB
-    E1 --> EC[(ElastiCache / Redis)]
-    E2 --> EC
-    E1 --> S3M[(S3: media, documents)]
-    E2 --> S3M
-    E1 --> NAT["NAT Gateway<br/>per AZ"]
-    E2 --> NAT
-```
+<iframe src="/diagrams/aws-three-tier.html" title="Three-tier on AWS: one direction through three zones"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/aws-three-tier.html)
 
 | Tier | Services | What the tier actually owns |
 |---|---|---|
