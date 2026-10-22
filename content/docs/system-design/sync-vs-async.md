@@ -30,16 +30,10 @@ That single question resolves the large majority of cases correctly.
 
 ## The decision in full
 
-```mermaid
-flowchart TD
-    A["A needs B"] --> B{"Does A need the<br/>result to respond<br/>to its caller?"}
-    B -->|Yes| C{"Can A degrade<br/>gracefully if B<br/>is unavailable?"}
-    B -->|No| D["Async:<br/>event or command<br/>on a broker"]
-    C -->|Yes| E["Sync with timeout,<br/>fallback, circuit breaker"]
-    C -->|No| F{"Is B's availability<br/>>= A's SLO?"}
-    F -->|Yes| G["Sync. Accept<br/>the coupling."]
-    F -->|No| H["Redesign:<br/>cache, replicate,<br/>or move the work<br/>out of the request path"]
-```
+<iframe src="/diagrams/sync-vs-async.html" title="Synchronous or asynchronous: the decision in full"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/sync-vs-async.html)
 
 The bottom-right branch is where most real problems live. If A promises 99.9%
 availability and synchronously depends on B, C, and D, each at 99.9%, A's

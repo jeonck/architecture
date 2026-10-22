@@ -18,19 +18,10 @@ deploy," and versioning is only one of the answers.
 
 **Expand, migrate, contract.** Never change a contract in place.
 
-```mermaid
-sequenceDiagram
-    participant P as Producer
-    participant C as Consumers
-    Note over P: 1. EXPAND
-    P->>P: Add new field/endpoint.<br/>Old one still works.
-    P->>C: Deploy. Nothing breaks.
-    Note over C: 2. MIGRATE
-    C->>C: Move to the new shape,<br/>at each consumer's own pace
-    C->>P: Telemetry confirms<br/>old path unused
-    Note over P: 3. CONTRACT
-    P->>P: Remove the old field.<br/>Only now.
-```
+<iframe src="/diagrams/api-contracts.html" title="Expand, migrate, contract: never change a contract in place"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/api-contracts.html)
 
 The third step is the one teams skip, which is why every mature codebase has
 deprecated fields from 2019 still in the response. Skipping it is survivable;

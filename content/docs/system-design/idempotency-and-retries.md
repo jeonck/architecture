@@ -23,25 +23,10 @@ The only question is whether you designed for it.
 Every state-changing operation that can be retried needs an **idempotency
 key**: a client-generated identifier that lets the server recognise a repeat.
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant S as Server
-    participant D as Store
-    C->>S: POST /payments<br/>Idempotency-Key: abc-123
-    S->>D: INSERT key abc-123 (unique)
-    alt Key is new
-        D-->>S: OK
-        S->>S: Do the work
-        S->>D: Store result against key
-        S-->>C: 201 + result
-    else Key already exists
-        D-->>S: Conflict
-        S->>D: Fetch stored result
-        S-->>C: 200 + the SAME result
-    end
-    Note over C,S: Retry returns the original<br/>result, not a new one
-```
+<iframe src="/diagrams/idempotency-and-retries.html" title="Idempotency key: a retry returns the original result"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/idempotency-and-retries.html)
 
 The critical detail: a duplicate must return **the original result**, not an
 error and not a fresh execution. A client that gets a 409 on retry has learned

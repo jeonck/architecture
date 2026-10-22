@@ -38,18 +38,10 @@ two teams share.
 Take your last ten feature requests. For each, list the services that would
 change.
 
-```mermaid
-graph LR
-    subgraph "Bad boundary"
-    F1["Feature: add<br/>gift wrapping"] --> S1[Order svc]
-    F1 --> S2[Product svc]
-    F1 --> S3[Pricing svc]
-    F1 --> S4[Fulfilment svc]
-    end
-    subgraph "Good boundary"
-    F2["Feature: add<br/>gift wrapping"] --> S5[Checkout svc]
-    end
-```
+<iframe src="/diagrams/service-boundaries.html" title="Service boundaries: count the services a feature touches"
+        loading="lazy" style="width:100%;height:820px;border:1px solid var(--bs-border-color,#ddd);border-radius:8px"></iframe>
+
+[Open the diagram full screen](/diagrams/service-boundaries.html)
 
 If most features touch one service, the boundaries are good. If most features
 touch three or more, you have distributed a monolith and inherited every cost
