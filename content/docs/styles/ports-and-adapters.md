@@ -4,7 +4,7 @@ title: "Ports and Adapters (Hexagonal)"
 description: "One rule — dependencies point inward — and a test for whether you should be paying the indirection tax at all."
 icon: "hexagon"
 date: "2026-08-28"
-lastmod: "2026-08-28"
+lastmod: "2026-10-22"
 draft: false
 ---
 
@@ -61,6 +61,44 @@ cannot afford to run in a unit test.** Everything else can be called directly.
 That is why wrapping your own ORM in a repository is usually noise, while
 wrapping a payment provider is usually essential — one of those two vendors is
 going to have an outage, a price change, or a regional compliance problem.
+
+## Conforming to a standard beats wrapping a vendor
+
+There is a third option the hexagon framing tends to hide, and it is often the
+best one: do not abstract the vendor, just make sure you are speaking a
+protocol more than one implementation speaks. A standard wire protocol or API
+is not an abstraction you maintain — it is an exit someone else maintains.
+
+The contrast plays out in public:
+
+- **Redis changed its licence**, and teams whose code spoke the Redis wire
+  protocol — rather than a vendor-specific client feature set — could move to
+  Valkey with close to no application change. The portability was in the
+  protocol, not in anybody's `CacheService` wrapper.
+- **Ingress NGINX is being retired**: the Kubernetes project announced that
+  best-effort maintenance continues until March 2026, after which there are no
+  releases, bugfixes or security updates, and it recommends Gateway API as the
+  modern replacement. A deployment expressed in portable Ingress or Gateway API
+  terms is a migration; one expressed through a pile of controller-specific
+  annotations and injected configuration snippets is a rewrite. Nothing in the
+  retirement notice says the annotations are the problem — that is just where
+  the lock-in lives.
+
+So refine the test above. Before adding a port, ask in this order:
+
+1. **Is there a standard my dependency already speaks?** Conform to it and add
+   no port. Cheapest possible portability.
+2. **If not, will there be a second adapter?** Apply the table above.
+3. **If neither, call it directly.**
+
+Step one is the one teams skip, and it is the only one that costs nothing.
+
+**The exception that proves the rule: multiple model providers.** AI model
+APIs are mutually incompatible, change frequently, and — unusually — teams
+genuinely run several at once, routing by cost, latency, capability, or
+availability. That is not a speculative second adapter, it is three live ones
+on day one. Here an internal interface in front of the providers is correct by
+the test, not in spite of it.
 
 ## The failure mode
 

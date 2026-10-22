@@ -4,7 +4,7 @@ title: "Capacity, Load Shedding, and Backpressure"
 description: "A system without limits does not degrade under overload. It collapses, and then it stays down."
 icon: "compress"
 date: "2026-08-20"
-lastmod: "2026-08-20"
+lastmod: "2026-10-22"
 draft: false
 ---
 
@@ -110,7 +110,17 @@ They also change your API contract: clients must handle 429 and 503 correctly,
 with backoff and jitter. A shedding server plus a naive client is worse than
 neither.
 
+One load profile is routinely left out of all of this: **recovery**. When a
+dependency comes back, every client reconnects, every cache warms and every
+expired lease renews at the same instant — a spike that only ever happens when
+you are already degraded, and that is perfectly capable of knocking the
+dependency back over. Shedding and jitter apply to the restart stampede as much
+as to normal traffic, and the way to find out is to bring a dependency back
+under load rather than only killing it. See
+[Static Stability](../static-stability/).
+
 ## See also
 
 - [Failure Modes](../failure-modes/)
+- [Static Stability: Serving on Last-Known-Good](../static-stability/)
 - [Idempotency and Retries](/docs/system-design/idempotency-and-retries/)

@@ -8,17 +8,17 @@ The tacit, made explicit.
 
 ## What is here
 
-51 pages across nine sections. Every page follows the same shape: the
+53 pages across nine sections. Every page follows the same shape: the
 situation, the default, when the default is wrong, and what it costs.
 
 | Section | Covers |
 |---|---|
-| Foundations | Irreversible decisions, constraints, coupling, trade-offs, boring baselines |
+| Foundations | Irreversible decisions, constraints, coupling, trade-offs, boring baselines, what got cheaper |
 | System Design in Practice | Monolith first, service boundaries, sync vs async, API contracts, idempotency |
 | Data and State | Datastore choice, zero-downtime migrations, consistency, caching, event sourcing and CDC |
 | Delivery and CI/CD | Trunk-based development, pipeline design, progressive delivery, reproducible builds, rollback |
 | Platform and Infrastructure | Kubernetes reality, IaC, config and secrets, multi-tenancy, platform as product |
-| Reliability and Operations | SLOs, observability, backpressure, failure isolation, incident response |
+| Reliability and Operations | SLOs, observability, backpressure, failure isolation, static stability, incident response |
 | Security by Design | Threat modelling, identity and authorisation, secrets, supply chain, least privilege |
 | Making Knowledge Explicit | ADRs, diagrams, runbooks, design reviews, team memory |
 | Architecture Styles | Layered, ports and adapters, microservices, event-driven, CQRS, serverless, three-tier on AWS, query-in-place logs, per-user instances, data platform |

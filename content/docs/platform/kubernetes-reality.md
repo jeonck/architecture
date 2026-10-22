@@ -4,7 +4,7 @@ title: "Kubernetes: What You Sign Up For"
 description: "Kubernetes does not reduce operational burden. It standardises and relocates it — which is valuable, at a certain size."
 icon: "settings_suggest"
 date: "2026-08-20"
-lastmod: "2026-08-20"
+lastmod: "2026-10-22"
 draft: false
 ---
 
@@ -39,6 +39,19 @@ trade to be positive?**
 
 The upgrade treadmill is the one that surprises people. It is not a one-time
 adoption cost; it is a recurring tax, forever, and it needs an owner.
+
+A live example of that tax, worth knowing if you are choosing an ingress today:
+the Kubernetes project has announced the **retirement of Ingress NGINX** —
+best-effort maintenance until March 2026, then no releases, bugfixes or
+security updates — and recommends **Gateway API** as the modern replacement.
+Gateway API is also a better fit for how platform teams actually work, because
+it splits the roles the old Ingress conflated: the infrastructure team owns the
+`Gateway` (the entry point, its listeners and certificates), while service
+teams own their own `HTTPRoute`s. The separation is in the resource model
+rather than in a convention someone has to enforce. How portable your migration
+turns out to be depends on how much of your routing lives in
+controller-specific annotations rather than in the standard resources — see
+[Ports and Adapters](/docs/styles/ports-and-adapters/).
 
 ## The size question
 

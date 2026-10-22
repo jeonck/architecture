@@ -4,7 +4,7 @@ title: "Environments, Config, and Secrets"
 description: "Config is what differs between environments. Secrets are config that must never be readable. Conflating them causes both problems."
 icon: "key"
 date: "2026-08-20"
-lastmod: "2026-08-20"
+lastmod: "2026-10-22"
 draft: false
 ---
 
@@ -30,6 +30,56 @@ Separate config by **how it changes** and **who may read it**:
 The distinction that matters most: **runtime config must not require a deploy**.
 If turning off a misbehaving integration requires a build and a rollout, your
 incident response time is bounded by your pipeline duration.
+
+Which immediately raises the problem in the next section, because that
+sentence is only half the story.
+
+## Runtime config is a deploy with none of the safeguards
+
+Skipping the pipeline is the point of runtime config. It is also the risk, and
+the two are the same property seen from different sides. A flag flip, a
+rate-limit change, a policy row, a generated data file — each reaches every
+instance in production in seconds, with no build, no review, no canary, and
+usually no rollback button. It has the blast radius of a deploy and the
+ceremony of a database write.
+
+Two 2025 outages make the shape of it concrete, and neither involved a code
+deploy:
+
+- **Cloudflare, November 2025.** A permissions change in a database caused a
+  query to start returning duplicate rows, which roughly doubled the size of a
+  Bot Management feature file regenerated every five minutes. The proxy
+  preallocates for at most 200 features; the oversized file exceeded that and
+  the unhandled error panicked the core proxy, returning 5xx across the
+  network. Nobody edited a config value — an *upstream permission* changed the
+  content of generated data that ships globally every few minutes.
+- **Google Cloud, June 2025.** A policy change inserted into regional Spanner
+  tables contained unintended blank fields. The metadata replicated globally
+  within seconds, and a quota check added weeks earlier without feature-flag
+  protection hit a null pointer on those blanks and crashed Service Control
+  worldwide. Google's own follow-up: enforce feature-flag protection on all
+  changes to critical binaries, disabled by default.
+
+So treat the config and data plane as a release channel, and give it the
+controls the code channel already has:
+
+| Control | What it means for config |
+|---|---|
+| **Schema validation at write time** | Reject the value before it propagates, not after. A type, a range, a size ceiling |
+| **Size and cardinality bounds** | If a consumer preallocates for 200 of something, 201 must fail the write, not the reader |
+| **Staged rollout** | A flag reaches 1% of instances, then 50%, then all — the same shape as [progressive delivery](/docs/delivery/progressive-delivery/) |
+| **Versioned, with a revert** | Every change is a numbered version and "go back to the previous one" is one action |
+| **Reviewed when it is policy** | Authorisation rules and quota policy are code, whatever file they live in |
+| **Consumers fail soft** | A consumer that cannot parse new config keeps running on the last version it could. See [Static Stability](/docs/reliability/static-stability/) |
+
+The last row is the one that would have contained both incidents above, and
+it is worth stating as a rule: **the reader of config decides how bad a bad
+value gets.** A parser that panics converts a data problem into an outage; one
+that logs, alarms, and keeps the previous value converts it into a page for
+somebody who has time to look.
+
+None of this contradicts the rule above. Runtime config still must not
+require a deploy. It must merely stop pretending it is not one.
 
 ## Secrets: the rules that are not negotiable
 

@@ -4,7 +4,7 @@ title: "Event-Driven: When the Broker Is the Backbone"
 description: "Choreography scales in the writing and fails in the reading. What changes when the log becomes the centre of your system."
 icon: "bolt"
 date: "2026-08-28"
-lastmod: "2026-08-28"
+lastmod: "2026-10-22"
 draft: false
 ---
 
@@ -71,6 +71,39 @@ The practical split, and it is not a compromise:
 - **Orchestration for business processes.** Anything with money, compensation,
   a deadline, or a customer-visible status. If someone will one day ask "why is
   order 4471 stuck", you need a component whose job is to know.
+
+## Durable execution changed what orchestration costs
+
+The historic objection to orchestration was that you had to build it. A state
+machine persisted somewhere, a scheduler to advance it, retry bookkeeping,
+idempotency on every step, and a way to see where an instance of the process
+had got to. That is a lot of machinery to avoid a few subscriptions, which is
+why teams reached for choreography even where it was the wrong answer.
+
+**Durable execution** engines removed most of that work. You write the process
+as ordinary sequential code — call this, wait for that, retry the other — and
+the engine persists the position after each completed step. The process
+survives a crash, a deploy, or a machine disappearing, and resumes from the
+last completed step rather than the beginning. The save-point analogy is exact,
+and the state of each running instance is queryable, which is the part that
+matters at 3am.
+
+The reason this arrived in the mainstream when it did is worth noting: AI agent
+work is long-running, multi-step, and full of calls that fail or take minutes.
+That workload made the engines popular, but nothing about them is AI-specific —
+order fulfilment and payment reconciliation had the same shape all along.
+
+The decision is now about process shape rather than tooling cost:
+
+| The work is… | Use |
+|---|---|
+| One step, fire and forget — send the email, invalidate the cache, index the document | A queue. Adding a workflow engine here is overhead with extra steps |
+| Many steps, with waits, retries, compensation, or a status someone will ask about | Durable execution, or a workflow engine |
+| Fan-out to thousands of independent items | A queue, with the *batch* tracked as a durable process if anyone needs to know when it finished |
+
+What it does not remove: the steps still have to be idempotent, because
+resume-after-crash means a step may run twice. The engine guarantees the
+process makes progress, not that your side effects are safe.
 
 ## The non-negotiables
 
